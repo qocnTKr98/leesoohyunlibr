@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>이야기 릴레이 - 1인 2턴</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f1f1f1;
+      text-align: center;
+      padding: 30px;
+    }
+    #story-log {
+      border: 2px dashed #999;
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      min-height: 150px;
+      background-color: #fff;
+      white-space: pre-wrap;
+      text-align: left;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+    #topic-box {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+      min-height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📖 이야기 릴레이</h1>
+
+  <!-- 활기찬 춤추는 학생 그림 -->
+  <div style="margin: 30px auto; max-width: 300px;">
+    <svg viewBox="0 0 220 220" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" >
+      <!-- 배경 풍선 -->
+      <circle cx="40" cy="40" r="18" fill="#ffcc00" opacity="0.7"/>
+      <circle cx="180" cy="60" r="15" fill="#ff6666" opacity="0.7"/>
+      <circle cx="70" cy="170" r="20" fill="#66ccff" opacity="0.7"/>
+      <circle cx="150" cy="160" r="22" fill="#99ff99" opacity="0.7"/>
+
+      <!-- 학생 몸통 -->
+      <ellipse cx="110" cy="130" rx="40" ry="60" fill="#F4C2C2" />
+      
+      <!-- 머리 -->
+      <circle cx="110" cy="60" r="38" fill="#FAD6A5" stroke="#333" stroke-width="2" />
+      
+      <!-- 눈 - 활짝 웃음 -->
+      <path d="M85 55 Q95 70 105 55" stroke="#333" stroke-width="4" fill="none" />
+      <path d="M115 55 Q125 70 135 55" stroke="#333" stroke-width="4" fill="none" />
+      
+      <!-- 코 -->
+      <circle cx="110" cy="70" r="5" fill="#D48C82" />
+      
+      <!-- 입 - 활짝 웃는 입 -->
+      <path d="M80 90 Q110 120 140 90" fill="#ff5555" stroke="#a00000" stroke-width="2" />
+      
+      <!-- 팔 - 춤추는 포즈 -->
+      <path d="M65 130 Q50 80 80 70" stroke="#F4C2C2" stroke-width="20" stroke-linecap="round" />
+      <path d="M155 130 Q170 80 140 70" stroke="#F4C2C2" stroke-width="20" stroke-linecap="round" />
+      
+      <!-- 다리 -->
+      <path d="M80 190 Q90 170 110 180" stroke="#F4C2C2" stroke-width="20" stroke-linecap="round" />
+      <path d="M140 190 Q130 170 110 180" stroke="#F4C2C2" stroke-width="20" stroke-linecap="round" />
+      
+      <!-- 케이크 -->
+      <rect x="30" y="140" width="30" height="20" rx="5" ry="5" fill="#ff99cc" />
+      <circle cx="45" cy="140" r="5" fill="#ffeecc" />
+      <rect x="40" y="130" width="10" height="10" fill="#cc6699" />
+      
+      <!-- 버블티 -->
+      <rect x="150" y="140" width="25" height="40" rx="10" ry="10" fill="#996633" />
+      <circle cx="163" cy="175" r="5" fill="#000" />
+      <line x1="165" y1="130" x2="165" y2="140" stroke="#330000" stroke-width="4" />
+      
+      <!-- 말풍선 -->
+      <path d="M160 30 Q185 5 210 30 L210 80 Q185 105 160 80 Z" fill="#ffefcc" stroke="#cca366" stroke-width="2" />
+      <text x="170" y="55" font-family="Arial" font-size="12" fill="#aa5500" font-weight="bold">
+        김동남 씨도 놀랄 신남!
+      </text>
+    </svg>
+  </div>
+
+  <div id="topic-box">🎲 전 문장: (아직 문장이 없습니다.)</div>
+  <button onclick="generateRandomTopic()" disabled>랜덤 시작 문장 생성 (게임 시작 후 비활성화)</button>
+  <br><br>
+  <label>현재 플레이어: <span id="player-num">1</span> / 5</label><br>
+  <label>총 턴: <span id="turn-count">1</span> / 10</label><br>
+  <input type="text" id="sentence-input" placeholder="문장을 입력하세요" size="50" />
+  <br>
+  <button onclick="submitSentence()">입력</button>
+  <button onclick="showStory()">전체 이야기 보기</button>
+  <div id="story-log" style="display:none;"></div>
+
+  <script>
+    const randomTopics = [
+      "수업 시간에 갑자기 모든 친구들의 핸드폰이 동시에 울리기 시작했다.",
+      "시험지를 받자마자 글자가 이상하게 보이기 시작했다.",
+      "내 옆자리에 어느 날 갑자기 전학생이 앉았는데, 그 애는 나와 똑같이 생겼다.",
+      "교무실에서 이상한 비밀 지도를 발견했다.",
+      "내가 쓴 연애편지가 반 전체 단톡방에 올라갔다.",
+      "교장 선생님이 갑자기 스트리머로 데뷔하셨다.",
+      "화장실 거울 속 내 얼굴이 계속 윙크를 했다.",
+      "급식실 아주머니가 내 이름을 정확히 알고 계셨다. 나는 처음 봤는데.",
+      "시험 문제 중 하나가 '이 문제를 풀면 소원이 이루어집니다'였다.",
+      "나의 그림자가 갑자기 말을 걸어왔다.",
+      // 새 문장 추가
+      "학교 운동장에서 친구들이 갑자기 댄스 배틀을 시작했다!",
+      "수업 중에 선생님이 갑자기 케이크를 꺼내서 나눠주셨다!",
+      "점심시간에 갑자기 바나나가 하늘에서 떨어졌다!",
+      "친구가 비밀리에 만든 초콜릿을 몰래 나눠줬다!",
+      "교실 한쪽에서 갑자기 버블티 파티가 열렸다!",
+      "선생님이 갑자기 랩 배틀을 제안하셨다!",
+      "점심 급식에 내가 좋아하는 피자가 나왔다!",
+      "갑자기 교실 천장에 풍선이 가득 떠다녔다!",
+      "방과 후에 모두가 모여 스낵 타임을 즐겼다!",
+      "친구가 만든 특별한 과일 주스를 나눠줬다!"
+    ];
+
+    const sentences = [];
+    let turn = 1;
+    let topicSet = false;
+
+    // 첫 문장 랜덤 생성 후 고정 & 버튼 비활성화
+    function generateRandomTopic() {
+      if (topicSet) return; // 한번만 실행
+      const topic = randomTopics[Math.floor(Math.random() * randomTopics.length)];
+      sentences.push(topic);
+      document.getElementById("topic-box").textContent = `🎲 전 문장: "${topic}"`;
+      document.getElementById("sentence-input").value = "";
+      topicSet = true;
+      document.getElementById("player-num").textContent = 1;
+      document.getElementById("turn-count").textContent = 1;
+      document.querySelector("button[onclick='generateRandomTopic()']").disabled = true;
+      alert("시작 문장이 생성되었습니다! 플레이어 1 차례입니다.");
+    }
+
+    // 입력 함수
+    function submitSentence() {
+      const input = document.getElementById("sentence-input");
+      const sentence = input.value.trim();
+
+      if (!topicSet) {
+        alert("먼저 시작 문장을 생성해주세요.");
+        return;
+      }
+
+      if (sentence === "") {
+        alert("문장을 입력해주세요.");
+        return;
+      }
+
+      sentences.push(sentence);
+      input.value = "";
+
+      if (turn < 10) {
+        turn++;
+        const player = ((turn - 1) % 5) + 1;
+        document.getElementById("turn-count").textContent = turn;
+        document.getElementById("player-num").textContent = player;
+        document.getElementById("topic-box").textContent = `🎲 전 문장: "${sentences[sentences.length - 1]}"`;
+        alert(`플레이어 ${player} 차례입니다!`);
+      } else {
+        document.getElementById("turn-count").textContent = turn;
+        document.getElementById("topic-box").textContent = `🎲 전 문장: "${sentences[sentences.length - 1]}"`;
+        alert("모든 플레이어가 두 번씩 입력을 마쳤습니다.\n'전체 이야기 보기' 버튼을 눌러주세요!");
+      }
+    }
+
+    // 이야기 출력 함수
+    function showStory() {
+      if (sentences.length === 0) {
+        alert("아직 이야기가 없습니다.");
+        return;
+      }
+      const log
